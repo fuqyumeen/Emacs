@@ -1,0 +1,2 @@
+$emacsPath = "C:\Program Files\Emacs\emacs-31.1\bin"
+[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";$emacsPath", "User")
