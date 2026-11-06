@@ -1,240 +1,169 @@
-;; -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; --
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; PACKAGE MANAGEMENT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; PACKAGE MANAGEMENT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'package)
 
-(setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")))
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/") ("melpa" . "https://melpa.org/packages/")))
 
 (package-initialize)
 
-(unless package-archive-contents
-  (package-refresh-contents))
+(unless package-archive-contents (package-refresh-contents))
 
-;;set the font
-;; Iosevka font
-(set-face-attribute 'default nil
-                    :family "Iosevka"
-                    :height 140
-                    :weight 'medium)
+(defvar my-required-packages '(web-mode typescript-mode js2-mode json-mode prettier-js company yasnippet rainbow-mode which-key magit))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; INSTALL PACKAGES
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-icomplete-mode
-(defvar my-required-packages
-  '(web-mode
-    typescript-mode
-    js2-mode
-    json-mode
-    prettier-js
-    company
-    yasnippet
-    rainbow-mode
-    which-key
-    magit))
+(dolist (pkg my-required-packages) (unless (package-installed-p pkg) (package-install pkg)))
 
-(dolist (pkg my-required-packages)
-  (unless (package-installed-p pkg)
-    (package-install pkg)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; FONT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(set-face-attribute 'default nil :family "Iosevka" :height 140 :weight 'medium)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; BASIC SETTINGS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; BASIC SETTINGS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq inhibit-startup-screen t)
 
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
+(menu-bar-mode -1) (tool-bar-mode -1) (scroll-bar-mode -1)
 
-(global-display-line-numbers-mode 1)
-(column-number-mode 1)
-(global-hl-line-mode -1)
+(global-display-line-numbers-mode 1) (column-number-mode 1)
 
-(show-paren-mode 1)
-(electric-pair-mode 1)
-(which-key-mode 1)
+(show-paren-mode 1) (electric-pair-mode 1) (which-key-mode 1)
 
+;; Enable native syntax highlighting (global-font-lock-mode 1) (setq font-lock-maximum-decoration t) (setq font-lock-maximum-size nil)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; THEME
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Better highlighting (setq-default truncate-lines nil)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; THEME ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (load-theme 'tango-dark t)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; AUTOCOMPLETE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; AUTOCOMPLETE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'company)
+
 (global-company-mode 1)
 
-(setq company-minimum-prefix-length 1)
-(setq company-idle-delay 0.2)
+(setq company-minimum-prefix-length 1) (setq company-idle-delay 0.2)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; WEB MODE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; WEB MODE: HTML / JSX / TSX / VUE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'web-mode)
 
-(add-to-list 'auto-mode-alist
-             '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\.html?\'" . web-mode))
 
-(add-to-list 'auto-mode-alist
-             '("\\.jsx?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\.jsx\'" . web-mode))
 
-(add-to-list 'auto-mode-alist
-             '("\\.tsx?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\.tsx\'" . web-mode))
 
-(add-to-list 'auto-mode-alist
-             '("\\.vue\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\.vue\'" . web-mode))
 
-(add-to-list 'auto-mode-alist
-             '("\\.css\\'" . web-mode))
+;; Enable syntax highlighting in web-mode (setq web-mode-enable-auto-closing t) (setq web-mode-enable-auto-pairing t) (setq web-mode-enable-css-colorization t) (setq web-mode-enable-current-element-highlight t)
 
-(setq web-mode-enable-auto-closing t)
-(setq web-mode-enable-auto-pairing t)
-(setq web-mode-enable-css-colorization t)
+;; Syntax highlighting for embedded languages (setq web-mode-enable-block-face t) (setq web-mode-enable-part-face t)
 
-(setq web-mode-markup-indent-offset 2)
-(setq web-mode-css-indent-offset 2)
-(setq web-mode-code-indent-offset 2)
+;; Indentation (setq web-mode-markup-indent-offset 2) (setq web-mode-css-indent-offset 2) (setq web-mode-code-indent-offset 2)
 
+;; JSX / TSX highlighting (setq web-mode-content-types-alist '(("jsx" . "\.jsx?\'") ("tsx" . "\.tsx\'")))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; JAVASCRIPT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-hook 'web-mode-hook (lambda () (setq-local font-lock-maximum-decoration t) (setq-local web-mode-enable-auto-quoting t)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; JAVASCRIPT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'js2-mode)
 
-(add-to-list 'auto-mode-alist
-             '("\\.js\\'" . js2-mode))
+(add-to-list 'auto-mode-alist '("\.js\'" . js2-mode))
 
-(add-to-list 'auto-mode-alist
-             '("\\.mjs\\'" . js2-mode))
+(add-to-list 'auto-mode-alist '("\.mjs\'" . js2-mode))
 
-(add-to-list 'auto-mode-alist
-             '("\\.cjs\\'" . js2-mode))
+(add-to-list 'auto-mode-alist '("\.cjs\'" . js2-mode))
 
 (setq js2-basic-offset 2)
 
+;; Highlight functions, variables, and keywords (setq js2-highlight-level 3)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TYPESCRIPT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-hook 'js2-mode-hook (lambda () (setq-local js-indent-level 2) (setq-local font-lock-maximum-decoration t)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; TYPESCRIPT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'typescript-mode)
 
-(add-to-list 'auto-mode-alist
-             '("\\.ts\\'" . typescript-mode))
+(add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode))
 
+(setq typescript-indent-level 2)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; JSON
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-hook 'typescript-mode-hook (lambda () (setq-local font-lock-maximum-decoration t)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; CSS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-to-list 'auto-mode-alist '("\.css\'" . css-mode))
+
+(setq css-indent-offset 2)
+
+(add-hook 'css-mode-hook (lambda () (setq-local font-lock-maximum-decoration t)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; JSON ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'json-mode)
 
-(add-to-list 'auto-mode-alist
-             '("\\.json\\'" . json-mode))
+(add-to-list 'auto-mode-alist '("\.json\'" . json-mode))
 
+(setq json-reformat:indent-width 2)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; JSX / TSX
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; OTHER WEB FILES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun my-jsx-setup ()
-  (setq-local js-indent-level 2))
+(add-to-list 'auto-mode-alist '("\.scss\'" . css-mode))
 
-(add-hook 'js2-mode-hook #'my-jsx-setup)
+(add-to-list 'auto-mode-alist '("\.sass\'" . css-mode))
 
+(add-to-list 'auto-mode-alist '("\.less\'" . css-mode))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; SNIPPETS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-to-list 'auto-mode-alist '("\.xml\'" . xml-mode))
+
+(add-to-list 'auto-mode-alist '("\.ya?ml\'" . yaml-mode))
+
+(add-to-list 'auto-mode-alist '("\.md\'" . markdown-mode))
+
+(add-to-list 'auto-mode-alist '("\.sql\'" . sql-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; SNIPPETS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'yasnippet)
+
 (yas-global-mode 1)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CSS COLORS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; CSS COLORS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'rainbow-mode)
 
-(add-hook 'css-mode-hook #'rainbow-mode)
-(add-hook 'web-mode-hook #'rainbow-mode)
+(add-hook 'css-mode-hook #'rainbow-mode) (add-hook 'web-mode-hook #'rainbow-mode)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; PRETTIER
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; PRETTIER ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'prettier-js)
 
-(add-hook 'web-mode-hook
-          (lambda ()
-            (when (member
-                   (file-name-extension
-                    (or buffer-file-name ""))
-                   '("html" "css" "js" "jsx" "ts" "tsx"))
-              (prettier-js-mode 1))))
+(add-hook 'web-mode-hook (lambda () (when (member (file-name-extension (or buffer-file-name "")) '("html" "css" "js" "jsx" "ts" "tsx")) (prettier-js-mode 1))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; SHORTCUTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; SHORTCUTS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "C-c c") #'compile) (global-set-key (kbd "C-c f") #'find-file) (global-set-key (kbd "C-c s") #'save-buffer)
 
-(global-set-key (kbd "C-c c") #'compile)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; CURSOR ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(global-set-key (kbd "C-c f")
-                #'find-file)
-
-(global-set-key (kbd "C-c s")
-                #'save-buffer)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CURSOR
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(setq-default cursor-type 'bar)
-(set-cursor-color "orange")
+(setq-default cursor-type 'bar) (set-cursor-color "orange")
 
 (setq ring-bell-function 'ignore)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; FILE SETTINGS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FILE SETTINGS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(setq make-backup-files nil)
-(setq auto-save-default nil)
+(setq make-backup-files nil) (setq auto-save-default nil)
 
 (set-language-environment "UTF-8")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; NO TREE-SITTER ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Do not activate Tree-sitter automatically. (setq major-mode-remap-alist nil)
+
+(when (fboundp 'global-treesit-auto-mode) (global-treesit-auto-mode -1))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;; FINAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (message "Web development environment loaded!")
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(company js2-mode json-mode magit prettier-js rainbow-mode
-	     typescript-mode web-mode yasnippet)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
